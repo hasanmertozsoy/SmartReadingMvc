@@ -1,0 +1,62 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Studying</title>
+    <link rel="stylesheet" href="~/css/style.css" />
+</head>
+<body>
+
+    <div id="start-screen" class="screen active">
+        <div class="header">
+            <div class="app-title">Smart Studying</div>
+            <button class="btn-outline" onclick="exportData()" style="width:auto; padding:8px 12px; font-size:12px;">Yedekle (JSON)</button>
+        </div>
+        <div id="note-list" class="note-list"></div>
+        <button class="fab" onclick="openModal('add-modal')">+</button>
+    </div>
+
+    <div id="reader-screen" class="screen">
+        <div id="reader-container">
+        </div>
+        <div id="feedback-msg">🚀 Mükemmel Öğrenme Hızı!</div>
+    </div>
+
+    <div id="add-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0">Yeni Not</h2>
+            <input type="text" id="inp-title" placeholder="Başlık">
+            <textarea id="inp-text" placeholder="Metni buraya yapıştırın..."></textarea>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveNewNote()">Kaydet</button>
+                <button class="btn btn-outline" onclick="closeModal('add-modal')">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mode-modal" class="modal">
+        <div class="modal-content" style="text-align:center">
+            <h2>Okuma Modu</h2>
+            <p style="color:#aaa; font-size:0.9rem;">Nasıl çalışmak istersin?</p>
+            <button class="btn btn-primary" onclick="startSession('linear')">Sıralı Akış (Lineer)</button>
+            <button class="btn btn-primary" style="background: linear-gradient(45deg, #FF512F, #DD2476); color:white; border:none;" onclick="startSession('random')">Akıllı Karıştırma (AI)</button>
+            <button class="btn btn-outline" onclick="closeModal('mode-modal')">İptal</button>
+        </div>
+    </div>
+
+    <div id="pause-modal" class="modal">
+        <div class="modal-content" style="text-align:center">
+            <h2>Duraklatıldı</h2>
+            <button class="btn btn-primary" onclick="resumeSession()">Devam Et</button>
+            <button class="btn btn-danger" onclick="exitSession()">Kaydet ve Çık</button>
+        </div>
+    </div>
+
+    <script src="~/js/app.js"></script>
+</body>
+</html>
