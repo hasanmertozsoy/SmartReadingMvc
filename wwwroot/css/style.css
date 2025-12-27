@@ -2,7 +2,6 @@
     --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --bg-dark: #000;
     --text-light: #fff;
-    --card-shadow: 0 4px 15px rgba(0,0,0,0.3);
     --transition-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -15,6 +14,7 @@ body {
     font-family: var(--font-main);
     overflow: hidden;
     height: 100vh;
+    height: 100dvh;
     width: 100vw;
     user-select: none;
 }
@@ -56,38 +56,54 @@ body {
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     position: relative;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
 }
+
+#reader-container::-webkit-scrollbar {
+    display: none;
+}
+
 
 .card {
     width: 100%; height: 100vh;
+    height: 100dvh;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     position: relative;
     overflow: hidden;
     display: flex; justify-content: center; align-items: center;
-    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    transform-origin: center;
-    transition: transform 0.3s var(--transition-bounce);
-}
-
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-color: #111;
+    
+    transform: translate3d(0,0,0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+    contain: strict;
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 100dvh;
+    z-index: 1;
 }
 
 .card-content {
     width: 85%;
     text-align: center;
-    z-index: 2;
+    z-index: 4;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    pointer-events: none;
+    -webkit-font-smoothing: antialiased; 
+    transform: translateZ(0);
 }
 
 .overlay-dim {
     position: absolute; top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.3); z-index: 1;
+    background: rgba(0,0,0,0.3);
+    z-index: 3;
     pointer-events: none;
 }
 

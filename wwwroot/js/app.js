@@ -16,8 +16,7 @@ let userFontSize = DEFAULT_FONT_SIZE;
 window.onload = async () => {
     await initDB();
     renderNoteList();
-    setupGestures();
-    
+    setupInputHandlers();
 };
 
 function initDB() {
@@ -55,15 +54,17 @@ function parseText(text) {
     let raw = text.replace(/\n/g, ' ').split(/([.?!])\s+(?=[A-ZİĞÜŞÖÇ])/g);
     let sentences = [];
     let buffer = "";
-    const abbrs = ['Dr', 'Av', 'Prof', 'St', 'Alb', 'Yrd', 'Doç', 'Müh', 'vb', 'vs', 'bkz', 'min', 'max'];
+    const abbrs = ['Dr', 'Av', 'Prof', 'St', 'Alb', 'Yrd', 'Doç', 'Müh', 'vb', 'vs', 'bkz', 'min', 'max', 'Cad', 'Sok', 'Mah', 'No', 'Tel', 'Hz', 'Tic', 'Ltd', 'Şti', 'Inc', 'Corp'];
     
     for (let i = 0; i < raw.length; i++) {
         let part = raw[i];
         if (!part) continue;
         if (part.match(/^[.?!]$/)) {
             buffer += part;
-            let lastWord = buffer.trim().split(/\s+/).pop().replace(/[.?!]/g, '');
-            if (abbrs.includes(lastWord)) {
+            let tokens = buffer.trim().split(/\s+/);
+            let lastWord = tokens.pop().replace(/[.?!]/g, '');
+            
+            if (abbrs.includes(lastWord) || (tokens.length > 0 && abbrs.includes(tokens[tokens.length-1]))) {
                 buffer += " ";
             } else {
                 sentences.push(createSentenceObj(sentences.length, buffer.trim()));
@@ -133,15 +134,26 @@ async function renderNoteList() {
 
 function selectNote(id) {
     dbOp('getAll').then(notes => {
-        activeNote = notes.find(n => n.id === id);
-        openModal('mode-modal');
+        activeNote = notes.find(n => n.id == id);
+        
+        if (activeNote) {
+            const modalTitle = document.querySelector('#mode-modal h2');
+            if(modalTitle) modalTitle.innerText = activeNote.title;
+            openModal('mode-modal');
+        } else {
+            console.error("Not bulunamadı ID:", id);
+        }
     });
 }
 
 async function deleteNote(id) {
     if (confirm('Bu notu silmek istiyor musunuz?')) {
-        await dbOp('delete', id);
-        renderNoteList();
+        const notes = await dbOp('getAll');
+        const target = notes.find(n => n.id == id);
+        if (target) {
+            await dbOp('delete', target.id);
+            renderNoteList();
+        }
     }
 }
 
@@ -160,7 +172,10 @@ function exportData() {
 function startSession(mode) {
     sessionType = mode;
     closeModal('mode-modal');
-    try { document.documentElement.requestFullscreen(); } catch(e){}
+    
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    }
 
     if (mode === 'linear') {
         playlist = [...activeNote.sentences];
@@ -196,33 +211,46 @@ function generateRandomQueue(count) {
     }
 }
 
+function generatePatternImage() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 300;
+    canvas.height = 600;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    
+    const baseHue = Math.floor(Math.random() * 360);
+    ctx.fillStyle = `hsl(${baseHue}, 30%, 10%)`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    for (let i = 0; i < 20; i++) {
+        const shapeHue = (baseHue + Math.random() * 60 - 30) % 360;
+        ctx.fillStyle = `hsla(${shapeHue}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
+        
+        const type = Math.random();
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const size = Math.random() * 150 + 30;
+        
+        ctx.beginPath();
+        if (type < 0.4) {
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+        } else if (type < 0.8) {
+            ctx.rect(x - size/2, y - size/2, size, size);
+        } else {
+            ctx.moveTo(x, y - size);
+            ctx.lineTo(x + size, y + size);
+            ctx.lineTo(x - size, y + size);
+        }
+        ctx.fill();
+    }
+    return canvas.toDataURL('image/jpeg', 0.7);
+}
+
 function renderCards() {
     const container = document.getElementById('reader-container');
     container.innerHTML = ''; 
     
     playlist.forEach((sentence, index) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.dataset.index = index;
-        card.dataset.sid = sentence.id;
-        
-        const hue1 = Math.floor(Math.random() * 360);
-        const hue2 = (hue1 + 40 + Math.random() * 60) % 360;
-        const hue3 = (hue1 + 180) % 360;
-        card.style.background = `linear-gradient(${Math.random()*360}deg, hsl(${hue1}, 70%, 40%), hsl(${hue2}, 80%, 30%), hsl(${hue3}, 60%, 20%))`;
-        card.style.backgroundSize = "400% 400%";
-        
-        const content = document.createElement('div');
-        content.className = 'card-content';
-        content.style.fontSize = userFontSize + 'rem';
-        content.innerText = sentence.text;
-        
-        const dim = document.createElement('div');
-        dim.className = 'overlay-dim';
-
-        card.appendChild(dim);
-        card.appendChild(content);
-        container.appendChild(card);
+        createCardDOM(sentence, index, container);
     });
 
     setupObserver();
@@ -230,8 +258,34 @@ function renderCards() {
     currentCardIndex = 0;
 }
 
+function createCardDOM(sentence, index, container) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.index = index;
+    card.dataset.sid = sentence.id;
+    
+    card.style.backgroundImage = `url(${generatePatternImage()})`;
+    
+    const content = document.createElement('div');
+    content.className = 'card-content';
+    content.style.fontSize = userFontSize + 'rem';
+    content.innerText = sentence.text;
+    
+    const dim = document.createElement('div');
+    dim.className = 'overlay-dim';
+
+    card.appendChild(dim);
+    card.appendChild(content);
+    container.appendChild(card);
+    return card;
+}
+
 let observer;
 function setupObserver() {
+    if (observer) {
+        observer.disconnect();
+    }
+
     const options = { root: document.getElementById('reader-container'), threshold: 0.6 };
     
     observer = new IntersectionObserver((entries) => {
@@ -240,6 +294,7 @@ function setupObserver() {
                 const index = parseInt(entry.target.dataset.index);
                 if (index !== currentCardIndex) {
                     processCardFinished(currentCardIndex);
+
                     currentCardIndex = index;
                     startTime = Date.now();
                     
@@ -259,24 +314,7 @@ function appendMoreCards() {
     generateRandomQueue(5);
     const container = document.getElementById('reader-container');
     for (let i = playlist.length - 5; i < playlist.length; i++) {
-        const sentence = playlist[i];
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.dataset.index = i;
-        card.dataset.sid = sentence.id;
-        
-        const hue1 = Math.floor(Math.random() * 360);
-        card.style.background = `linear-gradient(${Math.random()*360}deg, hsl(${hue1}, 70%, 40%), hsl(${hue1+60}, 80%, 30%))`;
-        card.style.backgroundSize = "400% 400%";
-        
-        const content = document.createElement('div');
-        content.className = 'card-content';
-        content.style.fontSize = userFontSize + 'rem';
-        content.innerText = sentence.text;
-        
-        card.appendChild(document.createElement('div')).className='overlay-dim';
-        card.appendChild(content);
-        container.appendChild(card);
+        const card = createCardDOM(playlist[i], i, container);
         observer.observe(card);
     }
 }
@@ -297,9 +335,11 @@ function processCardFinished(index) {
         realSentence.baseSpeed = speed;
     } else {
         const ratio = speed / realSentence.baseSpeed;
-        let newWeight = realSentence.weight * ratio;
-        if (newWeight < 0.012) newWeight = 0.012;
+        let newWeight = ratio;
+        
+        if (newWeight < 0.01) newWeight = 0.01;
         if (newWeight > 5.0) newWeight = 5.0; 
+        
         realSentence.weight = parseFloat(newWeight.toFixed(4));
     }
     
@@ -308,12 +348,14 @@ function processCardFinished(index) {
 }
 
 function checkMastery() {
-    const allMastered = activeNote.sentences.every(s => {
-        if (!s.baseSpeed || s.history.length === 0) return false;
-        const lastSpeed = s.history[s.history.length - 1].ms;
-        return lastSpeed <= (s.baseSpeed * 0.5);
-    });
+    const masteredCount = activeNote.sentences.filter(s => s.weight < 0.5).length;
+    const total = activeNote.sentences.length;
+    
+    if (total > 0) {
+        activeNote.progress = (masteredCount / total) * 100;
+    }
 
+    const allMastered = masteredCount === total;
     if (allMastered) {
         const msg = document.getElementById('feedback-msg');
         msg.style.opacity = '1';
@@ -321,22 +363,62 @@ function checkMastery() {
     }
 }
 
-function setupGestures() {
+function setupInputHandlers() {
     const container = document.getElementById('reader-container');
     let touchStartTime = 0;
     let longPressTimer = null;
+    let startX = 0, startY = 0;
+    let isDragging = false;
+    
     let initialPinchDist = 0;
     let initialFontSize = 0;
-    
-    container.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-            touchStartTime = Date.now();
-            longPressTimer = setTimeout(() => {
+
+    const handleStart = (x, y) => {
+        startX = x;
+        startY = y;
+        isDragging = false;
+        touchStartTime = Date.now();
+        
+        longPressTimer = setTimeout(() => {
+            if (!isDragging) {
                 document.querySelectorAll('.card').forEach(c => c.style.animationPlayState = 'paused');
                 isPaused = true;
                 openModal('pause-modal');
-            }, 600); 
+            }
+        }, 600);
+    };
+
+    const handleMove = (x, y) => {
+        const diffX = Math.abs(x - startX);
+        const diffY = Math.abs(y - startY);
+        if (diffX > 10 || diffY > 10) {
+            isDragging = true;
+            clearTimeout(longPressTimer);
+        }
+    };
+
+    const handleEnd = () => {
+        clearTimeout(longPressTimer);
+        document.querySelectorAll('.card').forEach(c => {
+            c.style.transform = 'scale(1)'; 
+            c.style.animationPlayState = 'running';
+        });
+    };
+
+    container.addEventListener('mousedown', (e) => {
+        if (e.button === 0) handleStart(e.pageX, e.pageY);
+    });
+    container.addEventListener('mousemove', (e) => {
+        if (e.buttons === 1) handleMove(e.pageX, e.pageY);
+    });
+    container.addEventListener('mouseup', handleEnd);
+    container.addEventListener('mouseleave', handleEnd);
+
+    container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            handleStart(e.touches[0].pageX, e.touches[0].pageY);
         } else if (e.touches.length === 2) {
+            clearTimeout(longPressTimer);
             initialPinchDist = Math.hypot(
                 e.touches[0].pageX - e.touches[1].pageX,
                 e.touches[0].pageY - e.touches[1].pageY
@@ -345,17 +427,10 @@ function setupGestures() {
         }
     });
 
-    container.addEventListener('touchend', (e) => {
-        clearTimeout(longPressTimer);
-        document.querySelectorAll('.card').forEach(c => {
-            c.style.transform = 'scale(1)'; 
-            c.style.animationPlayState = 'running';
-        });
-    });
-    
     container.addEventListener('touchmove', (e) => {
-        clearTimeout(longPressTimer);
-        if (e.touches.length === 2) {
+        if (e.touches.length === 1) {
+            handleMove(e.touches[0].pageX, e.touches[0].pageY);
+        } else if (e.touches.length === 2) {
             const dist = Math.hypot(
                 e.touches[0].pageX - e.touches[1].pageX,
                 e.touches[0].pageY - e.touches[1].pageY
@@ -365,14 +440,11 @@ function setupGestures() {
             userFontSize = newSize;
             
             document.querySelectorAll('.card-content').forEach(el => el.style.fontSize = newSize + 'rem');
-            
-            const activeCard = document.querySelector('.card[data-index="'+currentCardIndex+'"]');
-            if(activeCard && scale > 1) {
-                activeCard.style.transform = `scale(${Math.min(1.5, scale)})`;
-            }
             e.preventDefault(); 
         }
     });
+    
+    container.addEventListener('touchend', handleEnd);
 }
 
 function resumeSession() {
@@ -384,7 +456,13 @@ function resumeSession() {
 function exitSession() {
     processCardFinished(currentCardIndex);
     dbOp('put', activeNote);
-    document.exitFullscreen().catch(e=>{});
+    
+    if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {}); 
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    }
+    
     closeModal('pause-modal');
     document.getElementById('reader-screen').classList.remove('active');
     document.getElementById('start-screen').classList.add('active');
