@@ -188,6 +188,18 @@ function startSession(mode) {
     renderCards();
 }
 
+const patternCache = [];
+const PATTERN_CACHE_SIZE = 5;
+
+function getCachedPattern(index) {
+    if (patternCache.length === 0) {
+        for (let i = 0; i < PATTERN_CACHE_SIZE; i++) {
+            patternCache.push(generatePatternImage());
+        }
+    }
+    return patternCache[index % patternCache.length];
+}
+
 function generateRandomQueue(count) {
     for (let i = 0; i < count; i++) {
         let pool = activeNote.sentences;
@@ -264,7 +276,7 @@ function createCardDOM(sentence, index, container) {
     card.dataset.index = index;
     card.dataset.sid = sentence.id;
     
-    card.style.backgroundImage = `url(${generatePatternImage()})`;
+    card.style.backgroundImage = `url(${getCachedPattern(index)})`;
     
     const content = document.createElement('div');
     content.className = 'card-content';
