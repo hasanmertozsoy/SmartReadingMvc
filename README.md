@@ -1,4 +1,4 @@
-**Smart Reading**, kullanıcıların metinleri daha hızlı okumasını ve öğrenmesini sağlamak amacıyla geliştirilmiş, **ASP.NET Core MVC** ve **Modern JavaScript** teknolojilerini kullanan hibrit bir web uygulamasıdır. Standart hızlı okuma tekniklerinin ötesine geçerek, kullanıcının okuma hızına göre kendini optimize eden dinamik bir algoritma kullanır.
+Kullanıcıların metinleri daha hızlı okumasını ve öğrenmesini sağlamak amacıyla geliştirilmiş, **ASP.NET Core MVC** ve **Modern JavaScript** teknolojilerini kullanan hibrit bir web uygulamasıdır. Standart hızlı okuma tekniklerinin ötesine geçerek, kullanıcının okuma hızına göre kendini optimize eden dinamik bir algoritma kullanır.
 
 ##  Temel Özellikler
 
