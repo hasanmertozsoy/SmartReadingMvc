@@ -12,11 +12,13 @@ let currentCardIndex = 0;
 let startTime = 0;
 let isPaused = false;
 let userFontSize = DEFAULT_FONT_SIZE;
+let backgroundObserver;
 
 window.onload = async () => {
     await initDB();
     renderNoteList();
     setupInputHandlers();
+    setupBackgroundObserver();
 };
 
 function initDB() {
@@ -211,6 +213,23 @@ function generateRandomQueue(count) {
     }
 }
 
+function setupBackgroundObserver() {
+    if (backgroundObserver) backgroundObserver.disconnect();
+
+    backgroundObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const card = entry.target;
+                if (card.dataset.bgGenerated === 'false') {
+                    card.style.backgroundImage = `url(${generatePatternImage()})`;
+                    card.dataset.bgGenerated = 'true';
+                    observer.unobserve(card);
+                }
+            }
+        });
+    }, { root: document.getElementById('reader-container'), rootMargin: '200px' });
+}
+
 function generatePatternImage() {
     const canvas = document.createElement('canvas');
     canvas.width = 300;
@@ -263,8 +282,9 @@ function createCardDOM(sentence, index, container) {
     card.className = 'card';
     card.dataset.index = index;
     card.dataset.sid = sentence.id;
+    card.dataset.bgGenerated = 'false';
     
-    card.style.backgroundImage = `url(${generatePatternImage()})`;
+    if (backgroundObserver) backgroundObserver.observe(card);
     
     const content = document.createElement('div');
     content.className = 'card-content';
