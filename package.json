@@ -1,0 +1,24 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Kullanıcıların metinleri daha hızlı okumasını ve öğrenmesini sağlamak amacıyla geliştirilmiş, **ASP.NET Core MVC** ve **Modern JavaScript** teknolojilerini kullanan hibrit bir web uygulamasıdır. Standart hızlı okuma tekniklerinin ötesine geçerek, kullanıcının okuma hızına göre kendini optimize eden dinamik bir algoritma kullanır.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasanmertozsoy/SmartReadingMvc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hasanmertozsoy/SmartReadingMvc/issues"
+  },
+  "homepage": "https://github.com/hasanmertozsoy/SmartReadingMvc#readme",
+  "dependencies": {
+    "playwright": "^1.57.0"
+  }
+}

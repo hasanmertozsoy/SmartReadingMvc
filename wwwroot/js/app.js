@@ -126,7 +126,7 @@ async function renderNoteList() {
                 <h3>${note.title}</h3>
                 <span>${note.sentences.length} Cümle • %${Math.round(note.progress || 0)}</span>
             </div>
-            <button class="btn-outline" style="width:auto; border-color:#ff4757; color:#ff4757" onclick="deleteNote('${note.id}')">Sil</button>
+            <button class="btn-outline" style="width:auto; border-color:#ff4757; color:#ff4757" onclick="deleteNote('${note.id}')" aria-label="Notu sil: ${note.title}">Sil</button>
         `;
         list.appendChild(div);
     });
