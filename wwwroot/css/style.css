@@ -146,3 +146,18 @@ textarea { height: 120px; resize: none; }
     z-index: 99; opacity: 0; transition: opacity 0.3s;
     pointer-events: none;
 }
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    animation: popUp 0.5s var(--transition-bounce);
+}
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    opacity: 0.3;
+}
+.empty-text {
+    font-size: 1rem;
+    line-height: 1.5;
+}
