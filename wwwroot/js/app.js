@@ -117,6 +117,17 @@ async function renderNoteList() {
     const notes = await dbOp('getAll');
     const list = document.getElementById('note-list');
     list.innerHTML = '';
+
+    if (notes.length === 0) {
+        list.innerHTML = `
+            <div style="text-align: center; color: #888; margin-top: 50px;">
+                <div style="font-size: 40px; margin-bottom: 10px;">📝</div>
+                <p>Henüz not eklemediniz.</p>
+                <p style="font-size: 0.9em;">Sağ alttaki + butonuna basarak başlayın.</p>
+            </div>
+        `;
+        return;
+    }
     
     notes.sort((a,b) => b.lastOpened - a.lastOpened).forEach(note => {
         const div = document.createElement('div');
