@@ -211,7 +211,19 @@ function generateRandomQueue(count) {
     }
 }
 
+const PATTERN_CACHE_SIZE = 12;
+let patternCache = [];
+
 function generatePatternImage() {
+    if (patternCache.length === 0) {
+        for (let i = 0; i < PATTERN_CACHE_SIZE; i++) {
+            patternCache.push(createSinglePattern());
+        }
+    }
+    return patternCache[Math.floor(Math.random() * patternCache.length)];
+}
+
+function createSinglePattern() {
     const canvas = document.createElement('canvas');
     canvas.width = 300;
     canvas.height = 600;
