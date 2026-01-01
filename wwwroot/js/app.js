@@ -3,8 +3,10 @@ const DB_VERSION = 1;
 const MIN_READ_TIME = 500;
 const MAX_READ_TIME = 30000;
 const DEFAULT_FONT_SIZE = 1.8;
+const PATTERN_POOL_SIZE = 12;
 
 let db;
+let patternPool = [];
 let activeNote = null;
 let sessionType = 'linear';
 let playlist = [];
@@ -14,6 +16,7 @@ let isPaused = false;
 let userFontSize = DEFAULT_FONT_SIZE;
 
 window.onload = async () => {
+    initPatternPool();
     await initDB();
     renderNoteList();
     setupInputHandlers();
@@ -211,6 +214,12 @@ function generateRandomQueue(count) {
     }
 }
 
+function initPatternPool() {
+    for (let i = 0; i < PATTERN_POOL_SIZE; i++) {
+        patternPool.push(generatePatternImage());
+    }
+}
+
 function generatePatternImage() {
     const canvas = document.createElement('canvas');
     canvas.width = 300;
@@ -264,7 +273,8 @@ function createCardDOM(sentence, index, container) {
     card.dataset.index = index;
     card.dataset.sid = sentence.id;
     
-    card.style.backgroundImage = `url(${generatePatternImage()})`;
+    // Performance: Use pooled pattern to avoid expensive canvas generation per card
+    card.style.backgroundImage = `url(${patternPool[index % PATTERN_POOL_SIZE]})`;
     
     const content = document.createElement('div');
     content.className = 'card-content';
