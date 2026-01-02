@@ -89,7 +89,12 @@ function createSentenceObj(id, text) {
     };
 }
 
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+function openModal(id) {
+    const modal = document.getElementById(id);
+    modal.style.display = 'flex';
+    const firstInput = modal.querySelector('input, textarea, button');
+    if (firstInput) firstInput.focus();
+}
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
 async function saveNewNote() {
