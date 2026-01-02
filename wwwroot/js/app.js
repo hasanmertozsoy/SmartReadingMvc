@@ -89,8 +89,21 @@ function createSentenceObj(id, text) {
     };
 }
 
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+let lastFocusedElement;
+function openModal(id) {
+    lastFocusedElement = document.activeElement;
+    const modal = document.getElementById(id);
+    modal.style.display = 'flex';
+
+    // UX: Focus first input or button for accessibility
+    const firstInput = modal.querySelector('input, textarea, button');
+    if(firstInput) firstInput.focus();
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    if(lastFocusedElement) lastFocusedElement.focus();
+}
 
 async function saveNewNote() {
     const title = document.getElementById('inp-title').value.trim() || 'Adsız Not';
