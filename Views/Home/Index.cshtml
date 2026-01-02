@@ -27,11 +27,16 @@
         <div id="feedback-msg">🚀 Mükemmel Öğrenme Hızı!</div>
     </div>
 
-    <div id="add-modal" class="modal">
+    <div id="add-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-add">
         <div class="modal-content">
-            <h2 style="margin-top:0">Yeni Not</h2>
+            <h2 id="modal-title-add" style="margin-top:0">Yeni Not</h2>
+
+            <label for="inp-title" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#ccc;">Başlık</label>
             <input type="text" id="inp-title" placeholder="Başlık">
+
+            <label for="inp-text" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#ccc;">İçerik</label>
             <textarea id="inp-text" placeholder="Metni buraya yapıştırın..."></textarea>
+
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="saveNewNote()">Kaydet</button>
                 <button class="btn btn-outline" onclick="closeModal('add-modal')">İptal</button>
@@ -39,9 +44,9 @@
         </div>
     </div>
 
-    <div id="mode-modal" class="modal">
+    <div id="mode-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-mode">
         <div class="modal-content" style="text-align:center">
-            <h2>Okuma Modu</h2>
+            <h2 id="modal-title-mode">Okuma Modu</h2>
             <p style="color:#aaa; font-size:0.9rem;">Nasıl çalışmak istersin?</p>
             <button class="btn btn-primary" onclick="startSession('linear')">Sıralı Akış (Lineer)</button>
             <button class="btn btn-primary" style="background: linear-gradient(45deg, #FF512F, #DD2476); color:white; border:none;" onclick="startSession('random')">Akıllı Karıştırma (AI)</button>
@@ -49,9 +54,9 @@
         </div>
     </div>
 
-    <div id="pause-modal" class="modal">
+    <div id="pause-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-pause">
         <div class="modal-content" style="text-align:center">
-            <h2>Duraklatıldı</h2>
+            <h2 id="modal-title-pause">Duraklatıldı</h2>
             <button class="btn btn-primary" onclick="resumeSession()">Devam Et</button>
             <button class="btn btn-danger" onclick="exitSession()">Kaydet ve Çık</button>
         </div>
