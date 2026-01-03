@@ -211,38 +211,27 @@ function generateRandomQueue(count) {
     }
 }
 
-function generatePatternImage() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 300;
-    canvas.height = 600;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    
+// Optimizing performance by replacing canvas operations with CSS gradients
+// This prevents blocking the main thread during card generation
+function generatePatternCSS() {
     const baseHue = Math.floor(Math.random() * 360);
-    ctx.fillStyle = `hsl(${baseHue}, 30%, 10%)`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const shapes = [];
+
+    // Background color
+    const bg = `hsl(${baseHue}, 30%, 10%)`;
     
-    for (let i = 0; i < 20; i++) {
+    // Generate 5 gradients to simulate shapes (lighter than 20 canvas ops)
+    for (let i = 0; i < 5; i++) {
         const shapeHue = (baseHue + Math.random() * 60 - 30) % 360;
-        ctx.fillStyle = `hsla(${shapeHue}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
+        const opacity = Math.random() * 0.15 + 0.05;
+        const x = Math.floor(Math.random() * 100);
+        const y = Math.floor(Math.random() * 100);
+        const size = Math.floor(Math.random() * 50 + 20); // % size
         
-        const type = Math.random();
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const size = Math.random() * 150 + 30;
-        
-        ctx.beginPath();
-        if (type < 0.4) {
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-        } else if (type < 0.8) {
-            ctx.rect(x - size/2, y - size/2, size, size);
-        } else {
-            ctx.moveTo(x, y - size);
-            ctx.lineTo(x + size, y + size);
-            ctx.lineTo(x - size, y + size);
-        }
-        ctx.fill();
+        shapes.push(`radial-gradient(circle at ${x}% ${y}%, hsla(${shapeHue}, 60%, 50%, ${opacity}) 0%, transparent ${size/2}%)`);
     }
-    return canvas.toDataURL('image/jpeg', 0.7);
+
+    return `${shapes.join(', ')}, ${bg}`;
 }
 
 function renderCards() {
@@ -264,7 +253,7 @@ function createCardDOM(sentence, index, container) {
     card.dataset.index = index;
     card.dataset.sid = sentence.id;
     
-    card.style.backgroundImage = `url(${generatePatternImage()})`;
+    card.style.background = generatePatternCSS();
     
     const content = document.createElement('div');
     content.className = 'card-content';
