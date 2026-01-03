@@ -145,4 +145,10 @@ textarea { height: 120px; resize: none; }
     font-weight: bold; font-size: 0.9rem;
     z-index: 99; opacity: 0; transition: opacity 0.3s;
     pointer-events: none;
+}.input-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 5px;
+    font-weight: 500;
 }
