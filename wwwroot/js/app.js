@@ -12,6 +12,7 @@ let currentCardIndex = 0;
 let startTime = 0;
 let isPaused = false;
 let userFontSize = DEFAULT_FONT_SIZE;
+let lastFocusedElement;
 
 window.onload = async () => {
     await initDB();
@@ -89,8 +90,19 @@ function createSentenceObj(id, text) {
     };
 }
 
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function openModal(id) {
+    lastFocusedElement = document.activeElement;
+    const modal = document.getElementById(id);
+    modal.style.display = 'flex';
+
+    const firstInput = modal.querySelector('input, textarea, button');
+    if(firstInput) firstInput.focus();
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    if(lastFocusedElement) lastFocusedElement.focus();
+}
 
 async function saveNewNote() {
     const title = document.getElementById('inp-title').value.trim() || 'Adsız Not';
