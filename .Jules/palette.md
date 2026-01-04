@@ -1,0 +1,3 @@
+## 2024-05-22 - Modal Accessibility & Labeling
+**Learning:** Adding `role="dialog"` and `aria-labelledby` to custom modal implementations is a low-effort, high-impact a11y win. Simple "display: none/flex" toggles often miss these, making them invisible or confusing to screen readers. Also, minimalist designs often skip labels for placeholders; using `.visually-hidden` labels is a robust pattern to satisfy a11y without compromising the visual aesthetic.
+**Action:** Always check custom JS modals for ARIA attributes. Create a `.visually-hidden` utility class in every project to easily retrofit accessible labels onto minimalist forms.
