@@ -211,38 +211,41 @@ function generateRandomQueue(count) {
     }
 }
 
-function generatePatternImage() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 300;
-    canvas.height = 600;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    
+function generatePatternCSS() {
+    const width = 300;
+    const height = 600;
     const baseHue = Math.floor(Math.random() * 360);
-    ctx.fillStyle = `hsl(${baseHue}, 30%, 10%)`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let svgContent = `<rect width="100%" height="100%" fill="hsl(${baseHue}, 30%, 10%)"/>`;
     
     for (let i = 0; i < 20; i++) {
         const shapeHue = (baseHue + Math.random() * 60 - 30) % 360;
-        ctx.fillStyle = `hsla(${shapeHue}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
+        const alpha = (Math.random() * 0.15 + 0.05).toFixed(2);
+        const fill = `hsla(${shapeHue}, 60%, 50%, ${alpha})`;
         
         const type = Math.random();
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const size = Math.random() * 150 + 30;
+        const x = Math.floor(Math.random() * width);
+        const y = Math.floor(Math.random() * height);
+        const size = Math.floor(Math.random() * 150 + 30);
         
-        ctx.beginPath();
         if (type < 0.4) {
-            ctx.arc(x, y, size, 0, Math.PI * 2);
+            // Circle
+            svgContent += `<circle cx="${x}" cy="${y}" r="${size}" fill="${fill}"/>`;
         } else if (type < 0.8) {
-            ctx.rect(x - size/2, y - size/2, size, size);
+            // Rect
+            svgContent += `<rect x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" fill="${fill}"/>`;
         } else {
-            ctx.moveTo(x, y - size);
-            ctx.lineTo(x + size, y + size);
-            ctx.lineTo(x - size, y + size);
+            // Triangle
+            const p1 = `${x},${y - size}`;
+            const p2 = `${x + size},${y + size}`;
+            const p3 = `${x - size},${y + size}`;
+            svgContent += `<polygon points="${p1} ${p2} ${p3}" fill="${fill}"/>`;
         }
-        ctx.fill();
     }
-    return canvas.toDataURL('image/jpeg', 0.7);
+
+    const svgString = `<svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'>${svgContent}</svg>`;
+    const base64 = btoa(unescape(encodeURIComponent(svgString)));
+    return `url('data:image/svg+xml;base64,${base64}')`;
 }
 
 function renderCards() {
@@ -264,7 +267,7 @@ function createCardDOM(sentence, index, container) {
     card.dataset.index = index;
     card.dataset.sid = sentence.id;
     
-    card.style.backgroundImage = `url(${generatePatternImage()})`;
+    card.style.backgroundImage = generatePatternCSS();
     
     const content = document.createElement('div');
     content.className = 'card-content';
