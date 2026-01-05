@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark</title>
+</head>
+<body>
+    <div id="result">Running...</div>
+    <script>
+        function generatePatternImage() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 600;
+            const ctx = canvas.getContext('2d', { alpha: false });
+
+            const baseHue = Math.floor(Math.random() * 360);
+            ctx.fillStyle = `hsl(${baseHue}, 30%, 10%)`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < 20; i++) {
+                const shapeHue = (baseHue + Math.random() * 60 - 30) % 360;
+                ctx.fillStyle = `hsla(${shapeHue}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
+
+                const type = Math.random();
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 150 + 30;
+
+                ctx.beginPath();
+                if (type < 0.4) {
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                } else if (type < 0.8) {
+                    ctx.rect(x - size/2, y - size/2, size, size);
+                } else {
+                    ctx.moveTo(x, y - size);
+                    ctx.lineTo(x + size, y + size);
+                    ctx.lineTo(x - size, y + size);
+                }
+                ctx.fill();
+            }
+            return canvas.toDataURL('image/jpeg', 0.7);
+        }
+
+        function generatePatternCSS() {
+            const width = 300;
+            const height = 600;
+            const baseHue = Math.floor(Math.random() * 360);
+
+            let svgContent = `<rect width="100%" height="100%" fill="hsl(${baseHue}, 30%, 10%)"/>`;
+
+            for (let i = 0; i < 20; i++) {
+                const shapeHue = (baseHue + Math.random() * 60 - 30) % 360;
+                const fill = `hsla(${shapeHue}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
+                const type = Math.random();
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const size = Math.random() * 150 + 30;
+
+                if (type < 0.4) {
+                    // Circle
+                    svgContent += `<circle cx="${x}" cy="${y}" r="${size}" fill="${fill}"/>`;
+                } else if (type < 0.8) {
+                    // Rect
+                    svgContent += `<rect x="${x - size/2}" y="${y - size/2}" width="${size}" height="${size}" fill="${fill}"/>`;
+                } else {
+                    // Triangle
+                    const p1 = `${x},${y - size}`;
+                    const p2 = `${x + size},${y + size}`;
+                    const p3 = `${x - size},${y + size}`;
+                    svgContent += `<polygon points="${p1} ${p2} ${p3}" fill="${fill}"/>`;
+                }
+            }
+
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${svgContent}</svg>`;
+            // We use unescape to handle UTF-8 characters if any (though here it is mostly numbers and basic letters)
+            // but standard btoa expects binary string.
+            // SVG is text, so we can just btoa it if it doesn't contain unicode characters outside Latin1.
+            // But to be safe:
+            return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+        }
+
+        // Benchmark
+        const iterations = 100;
+
+        const startCanvas = performance.now();
+        for(let i=0; i<iterations; i++) {
+            generatePatternImage();
+        }
+        const endCanvas = performance.now();
+        const canvasTime = endCanvas - startCanvas;
+
+        const startSVG = performance.now();
+        for(let i=0; i<iterations; i++) {
+            generatePatternCSS();
+        }
+        const endSVG = performance.now();
+        const svgTime = endSVG - startSVG;
+
+        const result = `Canvas: ${canvasTime.toFixed(2)}ms, SVG: ${svgTime.toFixed(2)}ms. Ratio: ${(canvasTime/svgTime).toFixed(2)}x faster`;
+        document.getElementById('result').innerText = result;
+        console.log(result);
+    </script>
+</body>
+</html>
