@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification</title>
+    <style>
+        /* Mock some styles */
+        .card { width: 300px; height: 600px; }
+    </style>
+</head>
+<body>
+    <div id="reader-container"></div>
+    <div id="note-list"></div>
+    <div id="mode-modal" style="display:none"><h2></h2></div>
+    <div id="add-modal" style="display:none"></div>
+    <div id="pause-modal" style="display:none"></div>
+    <div id="reader-screen"></div>
+    <div id="start-screen"></div>
+    <div id="feedback-msg"></div>
+
+    <!-- Load the app script -->
+    <script src="js/app.js"></script>
+
+    <script>
+        // Override window.onload to prevent auto-execution which might fail due to missing DOM elements or DB logic
+        window.onload = null;
+
+        (async function test() {
+            try {
+                // Mock playlist data
+                playlist = [
+                    {id: 101, text: "Test sentence 1", weight: 1, history: []},
+                    {id: 102, text: "Test sentence 2", weight: 1, history: []}
+                ];
+
+                // Call renderCards
+                renderCards();
+
+                // Verify DOM
+                const cards = document.querySelectorAll('.card');
+                if (cards.length !== 2) {
+                    throw new Error("Expected 2 cards, found " + cards.length);
+                }
+
+                // Verify Background Image
+                const bg = cards[0].style.backgroundImage;
+                console.log("Background Image:", bg);
+
+                if (!bg.includes("data:image/svg+xml")) {
+                    throw new Error("Background image does not seem to be SVG Data URI");
+                }
+
+                if (!bg.includes("base64")) {
+                    throw new Error("Background image is not base64 encoded");
+                }
+
+                const resultDiv = document.createElement('div');
+                resultDiv.id = 'test-result';
+                resultDiv.innerText = 'VERIFICATION PASSED';
+                document.body.appendChild(resultDiv);
+
+            } catch (e) {
+                console.error(e);
+                const resultDiv = document.createElement('div');
+                resultDiv.id = 'test-result';
+                resultDiv.innerText = 'VERIFICATION FAILED: ' + e.message;
+                document.body.appendChild(resultDiv);
+            }
+        })();
+    </script>
+</body>
+</html>
