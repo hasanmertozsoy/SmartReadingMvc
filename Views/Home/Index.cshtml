@@ -18,7 +18,7 @@
             <button class="btn-outline" onclick="exportData()" style="width:auto; padding:8px 12px; font-size:12px;">Yedekle (JSON)</button>
         </div>
         <div id="note-list" class="note-list"></div>
-        <button class="fab" onclick="openModal('add-modal')">+</button>
+        <button class="fab" onclick="openModal('add-modal')" aria-label="Yeni Not Ekle">+</button>
     </div>
 
     <div id="reader-screen" class="screen">
@@ -27,10 +27,14 @@
         <div id="feedback-msg">🚀 Mükemmel Öğrenme Hızı!</div>
     </div>
 
-    <div id="add-modal" class="modal">
+    <div id="add-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
         <div class="modal-content">
-            <h2 style="margin-top:0">Yeni Not</h2>
+            <h2 id="add-modal-title" style="margin-top:0">Yeni Not</h2>
+
+            <label for="inp-title" class="input-label">Başlık</label>
             <input type="text" id="inp-title" placeholder="Başlık">
+
+            <label for="inp-text" class="input-label">İçerik</label>
             <textarea id="inp-text" placeholder="Metni buraya yapıştırın..."></textarea>
             <div class="btn-group">
                 <button class="btn btn-primary" onclick="saveNewNote()">Kaydet</button>
