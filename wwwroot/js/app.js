@@ -17,6 +17,15 @@ window.onload = async () => {
     await initDB();
     renderNoteList();
     setupInputHandlers();
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const activeModal = document.querySelector('.modal[style*="flex"]');
+            if (activeModal) {
+                closeModal(activeModal.id);
+            }
+        }
+    });
 };
 
 function initDB() {
@@ -89,8 +98,22 @@ function createSentenceObj(id, text) {
     };
 }
 
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+let lastFocusedElement;
+
+function openModal(id) {
+    lastFocusedElement = document.activeElement;
+    const modal = document.getElementById(id);
+    modal.style.display = 'flex';
+    const focusable = modal.querySelector('input, button, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable) focusable.focus();
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    if (lastFocusedElement) {
+        lastFocusedElement.focus();
+    }
+}
 
 async function saveNewNote() {
     const title = document.getElementById('inp-title').value.trim() || 'Adsız Not';
