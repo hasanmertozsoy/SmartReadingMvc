@@ -1,8 +1,25 @@
+/* =========================================
+   Temel Ayarlar ve Değişkenler
+   ========================================= */
 :root {
     --sat: env(safe-area-inset-top);
     --sab: env(safe-area-inset-bottom);
 }
 
+body {
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+    background-color: var(--bg);
+    color: var(--text); /* Değişken ismi daha anlamlı hale getirildi: --tx -> --text */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* =========================================
+   Yardımcı Sınıflar (Utilities)
+   ========================================= */
+
+/* Scrollbar Gizleme */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -12,31 +29,25 @@
     scrollbar-width: none;
 }
 
+/* Seçilemez Alanlar */
 .noselect {
     user-select: none;
     -webkit-user-select: none;
 }
 
-body {
-    -webkit-font-smoothing: antialiased;
-    overscroll-behavior-y: none;
-    background-color: var(--bg);
-    color: var(--tx);
-    user-select: none;
-    -webkit-user-select: none;
-}
-
+/* Biyonik Okuma Kelime Efekti */
 .blur-word {
     filter: blur(4px);
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     cursor: pointer;
     border-radius: 4px;
     padding: 0 4px;
     pointer-events: auto;
 }
 
+/* Yükleniyor Animasyonu */
 .loader {
-    border: 3px solid rgba(255,255,255,0.1);
+    border: 3px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     border-top: 3px solid #fff;
     width: 20px;
@@ -45,14 +56,13 @@ body {
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
+/* =========================================
+   3. Parti Kütüphane Özelleştirmeleri
+   ========================================= */
 .katex {
     font-size: 1.1em;
 }
