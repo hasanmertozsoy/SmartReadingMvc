@@ -42,9 +42,9 @@ Projeyi yerel makinenizde çalıştırmak için aşağıdaki adımları izleyin:
 
 1. **Repoyu Klonlayın:**
 ```bash
-git clone https://github.com/kullaniciadi/SmartReadingMvc.git
+git clone https://github.com/hasanmertozsoy/SmartReadingMvc.git
 cd SmartReadingMvc
-
+code .
 ```
 
 2. **Bağımlılıkları Yükleyin ve Derleyin:**
