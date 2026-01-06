@@ -1,102 +1,67 @@
-Kullanıcıların metinleri daha hızlı okumasını ve öğrenmesini sağlamak amacıyla geliştirilmiş, **ASP.NET Core MVC** ve **Modern JavaScript** teknolojilerini kullanan hibrit bir web uygulamasıdır. Standart hızlı okuma tekniklerinin ötesine geçerek, kullanıcının okuma hızına göre kendini optimize eden dinamik bir algoritma kullanır.
+**Smart Reading**, kullanıcıların okuma hızını artırmayı, odaklanma süresini iyileştirmeyi ve metinleri daha verimli bir şekilde analiz etmelerini sağlayan yapay zeka destekli bir okuma asistanıdır.
 
-##  Temel Özellikler
+İstemci tarafında **React (ES Modules)** ve **Tailwind CSS** kullanılarak, derleme gerektirmeyen (no-build) hibrit bir yapı oluşturulmuştur.
 
-* **Akıllı Ağırlıklandırma Algoritması (AI-Based Learning):** Okuma hızınızı analiz ederek zorlandığınız cümleleri daha sık, ustalaştığınız cümleleri daha seyrek karşınıza çıkarır.
-* **Yerel Veritabanı (IndexedDB):** Tüm notlar, ilerleme durumları ve okuma geçmişi tarayıcınızın içinde güvenle saklanır. Sunucuya veri göndermez, tamamen çevrimdışı çalışabilir.
-* **Dinamik Görselleştirme (Canvas API):** Her kart için CPU/GPU dostu, anlık olarak oluşturulan benzersiz geometrik desenler ve renk paletleri sunar.
-* **Mobil Öncelikli Tasarım:** Dokunmatik jestler (Pinch-to-Zoom, Long Press) ile tam uyumlu, akıcı bir kullanıcı deneyimi sağlar.
-* **Yüksek Performans:** `IntersectionObserver` ve `requestAnimationFrame` kullanılarak optimize edilmiş, DOM manipülasyonunu minimumda tutan akıcı render motoru.
-* **Göz Dostu Arayüz:** OLED ekranlar için optimize edilmiş koyu mod (Dark Mode) ve "Noise" filtresi ile azaltılmış renk bantlanması (color banding).
+##  Algoritmik Çekirdek ve Verimlilik
 
-## Algoritma Mimarisi
+Smart Reading, rastgele bir okuma deneyimi sunmak yerine, kullanıcının performansına göre kendini adapte eden istatistiksel algoritmalar kullanır.
 
-Smart Reading, **Aralıklı Tekrar (Spaced Repetition)** ve **Aktif Geri Çağırma** prensiplerini temel alan özel bir algoritma kullanır:
+### 1. Aykırı Değer Tespiti (Outlier Detection)
+Okuma hızı hesaplanırken, kullanıcının anlık dalgınlıkları veya duraksamaları verileri kirletebilir. Sistem, **Standart Sapma (Standard Deviation)** tabanlı bir filtreleme uygular:
+* Her cümlenin okunma süresi kaydedilir.
+* Ortalama hız (`mean`) ve standart sapma (`sd`) hesaplanır.
+* Ortalamadan `2 * sd` kadar uzak olan okuma süreleri (çok hızlı geçilen veya çok uzun beklenen anlar) **"aykırı değer"** kabul edilerek istatistiğe dahil edilmez.
+* Bu sayede sistem, kullanıcının *gerçek* okuma hızını (Base Speed) %99 güven aralığında tespit eder.
 
-1. **Cümle Analizi:** Metinler yapıştırıldığında Regex motoru ile akıllıca cümlelere bölünür. Kısaltmalar (Dr., Prof., vb.) algılanarak hatalı bölünmeler engellenir.
-2. **Hız Takibi (Velocity Tracking):** Kullanıcı bir kartı geçtiğinde, kartın ekranda kaldığı süre (`ms`) hesaplanır.
-3. **Dinamik Ağırlıklandırma (Weight Update):**
-* Her cümlenin bir `Base Speed` (Temel Hız) değeri vardır.
-* Eğer kullanıcı cümleyi temel hızdan daha yavaş okursa, cümlenin **ağırlığı artar** (Daha zor kabul edilir).
-* Daha hızlı okursa ağırlık azalır.
-* Formül: `Yeni Ağırlık = (Anlık Hız / Temel Hız)`
-4. **Olasılıksal Kuyruk (Probabilistic Queue):** "Akıllı Karıştırma" modunda, yüksek ağırlığa sahip cümlelerin kuyruğa girme olasılığı daha yüksektir. Böylece uygulama sizi zorlandığınız kısımlarda daha fazla çalıştırır.
-5. **Ustalık (Mastery):** Bir cümlenin ağırlığı `0.5` altına düştüğünde, o cümle "Öğrenilmiş" kabul edilir ve ilerleme yüzdesi artar.
+### 2. Dinamik Ağırlıklandırma (Dynamic Weighting)
+Her cümlenin bir "zorluk ağırlığı" (`weight`) vardır:
+* Eğer bir cümle, kullanıcının ortalama hızından daha yavaş okunmuşsa, sistem bu cümlenin zor olduğunu varsayar ve ağırlığını artırır (`Math.pow` fonksiyonu ile üstel artış).
+* Daha hızlı okunan cümlelerin ağırlığı düşürülür.
 
-##  Teknolojiler
+### 3. Tekrar Mekanizması (Spaced Repetition)
+Okuma sırası **Ağırlıklı Rastgele Seçim (Weighted Random Selection)** algoritması ile belirlenir:
+* Sistem, sıradaki cümleyi seçerken ağırlığı yüksek (zorlanılan) cümlelere öncelik verir.
+* Bu yöntem, kullanıcının zaten bildiği kısımları hızlı geçmesini, zorlandığı kısımlar üzerinde ise daha fazla pratik yapmasını sağlar (Active Recall).
 
-* **Backend:** .NET 8.0 (ASP.NET Core MVC)
-* **Frontend:** Vanilla JavaScript (ES6+), CSS3 (Variables, Flexbox/Grid)
-* **Veri Depolama:** IndexedDB (Client-side NoSQL)
-* **Grafik:** HTML5 Canvas API (Prosedürel Doku Üretimi)
+##  Öne Çıkan Özellikler
+
+* **Biyonik Okuma (Bionic Reading):** Kelimelerin ilk kısımlarını vurgulayarak gözün metin üzerinde daha hızlı kaymasını sağlar.
+* **Akıllı Tekrar Sistemi:** Kullanıcının zorlandığı cümleleri tespit eder ve öğrenme sürecini optimize etmek için bunları daha sık gösterir.
+* **Pomodoro Entegrasyonu:** Odaklanma ve mola sürelerini yöneten dahili zamanlayıcı.
+* **Çoklu Format Desteği:** `.txt`, `.pdf` ve `.docx` dosyalarını içe aktarabilme.
+* **Metin Seslendirme (TTS):** İngilizce ve Türkçe metinler için yerleşik seslendirme desteği.
+* **Offline First:** Tüm veriler tarayıcı tabanlı `IndexedDB` üzerinde güvenle saklanır.
+
+##  Teknoloji Yığını
+
+* **Backend:** .NET 8, ASP.NET Core MVC
+* **Frontend:** React 18 (via ESM), Tailwind CSS (CDN)
+* **Veri Tabanı:** IndexedDB (Client-side NoSQL)
+* **Dosya İşleme:** PDF.js (PDF), Mammoth.js (Word)
+* **Matematiksel Gösterim:** KaTeX
 
 ##  Kurulum ve Çalıştırma
 
-Projeyi yerel makinenizde çalıştırmak için aşağıdaki adımları izleyin:
+Proje .NET 8 SDK gerektirir.
 
-### Gereksinimler
-
-* [.NET 8.0 SDK](https://dotnet.microsoft.com/download) veya üzeri.
-
-### Adımlar
-
-1. **Repoyu Klonlayın:**
-```bash
-git clone https://github.com/hasanmertozsoy/SmartReadingMvc.git
-cd SmartReadingMvc
-code .
-```
-
-2. **Bağımlılıkları Yükleyin ve Derleyin:**
-```bash
-dotnet restore
-dotnet build
-
-```
-
-3. **Uygulamayı Başlatın:**
-```bash
-dotnet run
-
-```
-
-Veya değişiklikleri anlık görmek için:
-```bash
-dotnet watch run
-
-```
-
-4. Tarayıcınızda `http://localhost:5000` (veya terminalde belirtilen port) adresine gidin.
-
-##  Kullanım Yönergeleri
-
-### 1. Not Ekleme
-
-* Ana ekrandaki **(+)** butonuna tıklayın.
-* Başlık ve metni girip **Kaydet** deyin.
-
-### 2. Okuma Modları
-
-Bir nota tıkladığınızda iki seçenek sunulur:
-
-* **Sıralı Akış (Lineer):** Metni baştan sona, orijinal sırasıyla okumanızı sağlar.
-* **Akıllı Karıştırma (AI):** Algoritmanın belirlediği, öğrenme ihtiyacınıza göre sıralanmış sonsuz bir döngü başlatır.
-
-### 3. Kontroller (Reader Ekranı)
-
-* **Kaydırma (Scroll):** Aşağı/Yukarı kaydırarak kartlar arasında geçiş yapın.
-* **Duraklatma (Pause):** Ekrana **basılı tutun** (Long Press) veya Mouse ile basılı tutun. Menü açılacaktır.
-* **Yazı Boyutu (Zoom):** Dokunmatik ekranlarda **iki parmakla çimdikleme (pinch)** hareketi yaparak yazı boyutunu anlık olarak değiştirebilirsiniz.
-
-### 4. Veri Yönetimi
-
-* **Yedekleme:** Ana ekrandaki "Yedekle (JSON)" butonu ile tüm veritabanınızı dışarı aktarabilirsiniz.
-* **Sıfırlama:** Tarayıcı geçmişini temizlemek IndexedDB verilerini silebilir, önemli notlarınızı yedeklemeyi unutmayın.
+1.  Repoyu klonlayın:
+    ```bash
+    git clone [https://github.com/kullaniciadi/smart-reading-mvc.git](https://github.com/kullaniciadi/smart-reading-mvc.git)
+    ```
+2.  Proje dizinine gidin:
+    ```bash
+    cd SmartReadingMvc
+    ```
+3.  Uygulamayı başlatın:
+    ```bash
+    dotnet run
+    ```
+4.  Tarayıcınızda `http://localhost:5000` (veya terminalde belirtilen port) adresine gidin.
 
 ##  Katkıda Bulunma
 
-1. Bu repoyu Fork'layın.
-2. Yeni bir özellik dalı oluşturun (`git checkout -b feature/YeniOzellik`).
-3. Değişikliklerinizi Commit edin (`git commit -m 'Yeni özellik eklendi'`).
-4. Dalınızı Push edin (`git push origin feature/YeniOzellik`).
-5. Bir Pull Request oluşturun.
+Algoritma iyileştirmeleri veya yeni özellik önerileri için Pull Request göndermekten çekinmeyin. Özellikle `calcMast` (Mastery Calculation) fonksiyonu üzerindeki istatistiksel iyileştirmeler projenin gelişimine büyük katkı sağlayacaktır.
+
+##  Lisans
+
+Bu proje MIT Lisansı ile lisanslanmıştır.
