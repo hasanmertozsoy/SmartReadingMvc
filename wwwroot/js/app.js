@@ -94,37 +94,33 @@ const parseText = (text) => {
 
 /**
  * Dinamik arka plan desenleri oluşturur.
+ * Canvas yerine SVG string kullanımı ile performans artışı.
  * @param {number} hue - Renk tonu değeri
  * @returns {string} Base64 formatında resim verisi
  */
 const generatePattern = (hue) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 800;
-    canvas.height = 1600;
-    if (!ctx) return '';
-
-    ctx.fillStyle = `hsl(${hue}, 30%, 10%)`;
-    ctx.fillRect(0, 0, 800, 1600);
-
+    let shapes = '';
     for (let i = 0; i < 20; i++) {
-        ctx.fillStyle = `hsla(${(hue + Math.random() * 60 - 30) % 360}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
+        const fill = `hsla(${(hue + Math.random() * 60 - 30) % 360}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
         const type = Math.random();
         const x = Math.random() * 800;
         const y = Math.random() * 1600;
         const size = Math.random() * 150 + 30;
 
-        ctx.beginPath();
-        if (type < 0.4) ctx.arc(x, y, size, 0, Math.PI * 2);
-        else if (type < 0.8) ctx.rect(x - size / 2, y - size / 2, size, size);
-        else {
-            ctx.moveTo(x, y - size);
-            ctx.lineTo(x + size, y + size);
-            ctx.lineTo(x - size, y + size);
+        if (type < 0.4) {
+            shapes += `<circle cx="${x}" cy="${y}" r="${size}" fill="${fill}" />`;
+        } else if (type < 0.8) {
+            shapes += `<rect x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" fill="${fill}" />`;
+        } else {
+            const x1 = x, y1 = y - size;
+            const x2 = x + size, y2 = y + size;
+            const x3 = x - size, y3 = y + size;
+            shapes += `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3}" fill="${fill}" />`;
         }
-        ctx.fill();
     }
-    return canvas.toDataURL('image/jpeg', 0.6);
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1600"><rect width="100%" height="100%" fill="hsl(${hue}, 30%, 10%)" />${shapes}</svg>`;
+    return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
 };
 
 /**
