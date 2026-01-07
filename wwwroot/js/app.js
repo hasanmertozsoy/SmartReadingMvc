@@ -15,9 +15,9 @@ const translate = (lang, key) => {
             edit: "Düzenle", new: "Yeni Not", title: "Başlık", content: "İçerik...", cancel: "İptal",
             save: "Kaydet", update: "Güncelle", settings: "Ayarlar", theme: "Tema", appearance: "Görünüm",
             language: "Dil", pomodoro: "Pomodoro", focus: "Odak", break: "Mola", backup: "Yedekle",
-            restore: "Geri Yükle", done: "Tamam", deleteConfirm: "Silinsin mi?", paused: "Duraklatıldı",
+            restore: "Geri Yükle", done: "Tamam", deleteConfirm: "Silinsin mi?", delete: "Sil", paused: "Duraklatıldı",
             resume: "Devam Et", saveExit: "Kaydet & Çık", shuffling: "Notlar karıştırılıyor...",
-            empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
+            fullscreen: "Tam Ekran", empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
             quickStartText: "Ekrana çift tıkla favorile. Basılı tut duraklat. İki parmakla yazı boyutu ayarla. Biyonik okuma ve seslendirme aktiftir. Sağ üstteki ses butonu ile okumayı açabilirsiniz.",
             restored: "Yüklendi!", error: "Hata", importFile: "Dosya Al", importing: "Aktarılıyor...",
             fileError: "Dosya hatası", sentences: "Cümle"
@@ -27,9 +27,9 @@ const translate = (lang, key) => {
             edit: "Edit", new: "New Note", title: "Title", content: "Content...", cancel: "Cancel",
             save: "Save", update: "Update", settings: "Settings", theme: "Theme", appearance: "Appearance",
             language: "Language", pomodoro: "Pomodoro", focus: "Focus", break: "Break", backup: "Backup",
-            restore: "Restore", done: "Done", deleteConfirm: "Delete?", paused: "Paused",
+            restore: "Restore", done: "Done", deleteConfirm: "Delete?", delete: "Delete", paused: "Paused",
             resume: "Resume", saveExit: "Save & Exit", shuffling: "Shuffling...", empty: "Empty.",
-            quickStartTitle: "Quick Start",
+            fullscreen: "Fullscreen", quickStartTitle: "Quick Start",
             quickStartText: "Double tap to favorite. Long press to pause. Pinch for font size. Bionic reading and TTS enabled. Toggle sound with the top right button.",
             restored: "Restored!", error: "Error", importFile: "Import File", importing: "Importing...",
             fileError: "File error", sentences: "Sentences"
@@ -842,10 +842,20 @@ const App = () => {
                                 {pomodoroState === 'break' ? <EyeOff size={20} /> : <Eye size={20} />}
                                 {formatTime(timer)}
                             </button>
-                            <button onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
+                            <button
+                                onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }}
+                                aria-label={translate(settings.language, 'fullscreen')}
+                                className="p-2 opacity-70 hover:opacity-100"
+                            >
                                 {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
                             </button>
-                            <button onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
+                            <button
+                                onClick={() => setIsSettingsOpen(true)}
+                                aria-label={translate(settings.language, 'settings')}
+                                className="p-2 opacity-70 hover:opacity-100"
+                            >
+                                <Settings size={20} />
+                            </button>
                         </div>
                     </header>
 
@@ -897,11 +907,18 @@ const App = () => {
                                             <div className="flex gap-2">
                                                 <button 
                                                     onClick={e => { e.stopPropagation(); setIsEditMode(true); setEditId(note.id); setTitleInput(note.title); setContentInput(note.sentences.map(s => s.text).join(' ')); setIsAddModalOpen(true); }} 
+                                                    aria-label={translate(settings.language, 'edit')}
                                                     className="p-2 text-gray-400 hover:text-[var(--accent)] rounded-full z-10 bg-black/5"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
+                                                <button
+                                                    onClick={e => deleteNote(e, note.id)}
+                                                    aria-label={translate(settings.language, 'delete')}
+                                                    className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -913,6 +930,7 @@ const App = () => {
                     {/* Ekle Butonu */}
                     <button 
                         onClick={() => { setIsEditMode(false); setTitleInput(''); setContentInput(''); setIsAddModalOpen(true); }} 
+                        aria-label={translate(settings.language, 'new')}
                         className="fixed bottom-8 right-8 mb-[env(safe-area-inset-bottom)] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 text-white" 
                         style={{ backgroundColor: 'var(--accent)' }}
                     >
