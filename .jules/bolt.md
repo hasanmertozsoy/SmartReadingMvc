@@ -1,0 +1,3 @@
+## 2026-01-08 - [O(N²) HTML Re-parsing in Recursive Traversal]
+**Learning:** Modifying `node.parentNode.innerHTML` inside a loop iterating over that same parent's children (or recursively traversing) causes repeated re-parsing of the entire parent content. This leads to O(N²) performance behavior when a container has many text nodes (e.g., text separated by `<br>` or flat structures).
+**Action:** Use `node.replaceWith()` with a new element or DocumentFragment to replace specific nodes without triggering a full re-parse of the parent container. Also, use `Array.from(node.childNodes)` when iterating if you plan to modify the DOM tree to avoid issues with live NodeLists.
