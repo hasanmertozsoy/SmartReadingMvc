@@ -1,0 +1,3 @@
+## 2026-01-08 - Dynamic ARIA Labels in React Functional Components
+**Learning:** Icon-only toggle buttons (like Mute/Unmute) require dynamic `aria-label` values that change with state. In this React codebase, simple ternary operators within the JSX attribute (e.g., `aria-label={isMuted ? 'Unmute' : 'Mute'}`) effectively communicate state changes to screen readers without needing complex `aria-pressed` management or live regions for simple toggles.
+**Action:** When implementing accessibility for state-toggling icon buttons, always ensure the `aria-label` reflects the *action* that will happen on click (e.g., "Unmute" when muted), not just the current state.
