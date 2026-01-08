@@ -128,14 +128,26 @@ const generatePattern = (hue) => {
 };
 
 /**
+ * HTML özel karakterlerini kaçış dizilerine dönüştürür (XSS koruması).
+ */
+const escapeHtml = (unsafe) => {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
+
+/**
  * Biyonik okuma formatlaması uygular.
  * Kelimelerin ilk yarılarını kalınlaştırır.
  */
 const applyBionicReading = (text) => {
     return text.split(' ').map(word => {
-        if (word.length < 2 || word.startsWith('\\')) return word;
+        if (word.length < 2 || word.startsWith('\\')) return escapeHtml(word);
         const midPoint = Math.ceil(word.length / 2);
-        return `<b>${word.slice(0, midPoint)}</b>${word.slice(midPoint)}`;
+        return `<b>${escapeHtml(word.slice(0, midPoint))}</b>${escapeHtml(word.slice(midPoint))}`;
     }).join(' ');
 };
 
@@ -164,9 +176,20 @@ const processDisplayContent = (text) => {
     // Metin düğümlerine biyonik okuma uygula
     const applyToNodes = (node) => {
         if (node.nodeType === 3) { // Text Node
-            node.parentNode.innerHTML = node.parentNode.innerHTML.replace(node.nodeValue, applyBionicReading(node.nodeValue));
-        } else if (node.nodeType === 1 && !node.className.includes('katex')) { // Element Node (KaTeX hariç)
-            node.childNodes.forEach(applyToNodes);
+            const text = node.nodeValue;
+            if (!text.trim()) return;
+
+            const newHtml = applyBionicReading(text);
+            if (newHtml !== text) {
+                const tempSpan = document.createElement('span');
+                tempSpan.innerHTML = newHtml;
+                node.replaceWith(...tempSpan.childNodes);
+            }
+        } else if (node.nodeType === 1) { // Element Node
+            const className = node.getAttribute('class') || '';
+            if (!className.includes('katex')) {
+                Array.from(node.childNodes).forEach(applyToNodes);
+            }
         }
     };
     applyToNodes(div);
