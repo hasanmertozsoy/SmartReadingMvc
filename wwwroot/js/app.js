@@ -20,7 +20,10 @@ const translate = (lang, key) => {
             empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
             quickStartText: "Ekrana çift tıkla favorile. Basılı tut duraklat. İki parmakla yazı boyutu ayarla. Biyonik okuma ve seslendirme aktiftir. Sağ üstteki ses butonu ile okumayı açabilirsiniz.",
             restored: "Yüklendi!", error: "Hata", importFile: "Dosya Al", importing: "Aktarılıyor...",
-            fileError: "Dosya hatası", sentences: "Cümle"
+            fileError: "Dosya hatası", sentences: "Cümle",
+            fullscreen: "Tam Ekran", exitFullscreen: "Tam Ekran Çıkış", openSettings: "Ayarları Aç",
+            editNote: "Notu Düzenle", deleteNote: "Notu Sil", addNote: "Yeni Not Ekle",
+            selectTheme: "Tema Seç", lightMode: "Açık Mod", darkMode: "Koyu Mod"
         },
         en: {
             app: "Smart Reading", my: "My Notes", fav: "Favorites", rev: "Review", no: "No notes.",
@@ -32,7 +35,10 @@ const translate = (lang, key) => {
             quickStartTitle: "Quick Start",
             quickStartText: "Double tap to favorite. Long press to pause. Pinch for font size. Bionic reading and TTS enabled. Toggle sound with the top right button.",
             restored: "Restored!", error: "Error", importFile: "Import File", importing: "Importing...",
-            fileError: "File error", sentences: "Sentences"
+            fileError: "File error", sentences: "Sentences",
+            fullscreen: "Fullscreen", exitFullscreen: "Exit Fullscreen", openSettings: "Open Settings",
+            editNote: "Edit Note", deleteNote: "Delete Note", addNote: "Add New Note",
+            selectTheme: "Select Theme", lightMode: "Light Mode", darkMode: "Dark Mode"
         }
     };
     return dictionary[lang][key] || "";
@@ -842,10 +848,10 @@ const App = () => {
                                 {pomodoroState === 'break' ? <EyeOff size={20} /> : <Eye size={20} />}
                                 {formatTime(timer)}
                             </button>
-                            <button onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
+                            <button aria-label={isFullscreen ? translate(settings.language, 'exitFullscreen') : translate(settings.language, 'fullscreen')} onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
                                 {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
                             </button>
-                            <button onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
+                            <button aria-label={translate(settings.language, 'openSettings')} onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
                         </div>
                     </header>
 
@@ -853,14 +859,14 @@ const App = () => {
                     <div className="flex-none p-5 pb-0 bg-[var(--bg)] z-40">
                         <h2 className="text-2xl font-bold mb-4 px-1">{translate(settings.language, 'my')}</h2>
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div onClick={() => startSession('fav')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            <button onClick={() => startSession('fav')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><Heart size={24} className="text-red-500 fill-red-500" /><span className="text-2xl font-bold opacity-80">{getFavCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'fav')}</div>
-                            </div>
-                            <div onClick={() => startSession('rev')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            </button>
+                            <button onClick={() => startSession('rev')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><RefreshCcw size={24} className="text-[var(--accent)]" /><span className="text-2xl font-bold opacity-80">{getReviewCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'rev')}</div>
-                            </div>
+                            </button>
                         </div>
                         <div className="h-[1px] w-full bg-gray-500/10 mb-2"></div>
                     </div>
@@ -896,12 +902,13 @@ const App = () => {
                                             </div>
                                             <div className="flex gap-2">
                                                 <button 
+                                                    aria-label={translate(settings.language, 'editNote')}
                                                     onClick={e => { e.stopPropagation(); setIsEditMode(true); setEditId(note.id); setTitleInput(note.title); setContentInput(note.sentences.map(s => s.text).join(' ')); setIsAddModalOpen(true); }} 
                                                     className="p-2 text-gray-400 hover:text-[var(--accent)] rounded-full z-10 bg-black/5"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
+                                                <button aria-label={translate(settings.language, 'deleteNote')} onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
                                             </div>
                                         </div>
                                     </div>
@@ -912,6 +919,7 @@ const App = () => {
 
                     {/* Ekle Butonu */}
                     <button 
+                        aria-label={translate(settings.language, 'addNote')}
                         onClick={() => { setIsEditMode(false); setTitleInput(''); setContentInput(''); setIsAddModalOpen(true); }} 
                         className="fixed bottom-8 right-8 mb-[env(safe-area-inset-bottom)] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 text-white" 
                         style={{ backgroundColor: 'var(--accent)' }}
@@ -964,6 +972,7 @@ const App = () => {
                                         {Object.keys(THEME_HUES).map(color => (
                                             <button 
                                                 key={color} 
+                                                aria-label={`${translate(settings.language, 'selectTheme')} ${color}`}
                                                 onClick={() => updateSettings({ ...settings, themeColor: color })} 
                                                 className={`w-8 h-8 rounded-full border-2 ${settings.themeColor === color ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-50'}`} 
                                                 style={{ backgroundColor: `hsl(${THEME_HUES[color]}, 80%, 50%)` }} 
@@ -975,8 +984,8 @@ const App = () => {
                                 <div className="mb-6">
                                     <label className="text-xs font-bold uppercase opacity-50 mb-2 block">{translate(settings.language, 'appearance')}</label>
                                     <div className="flex bg-black/10 rounded-lg p-1">
-                                        <button onClick={() => updateSettings({ ...settings, themeMode: 'light' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'light' ? 'bg-white shadow text-black' : 'opacity-50'}`}><Sun size={16} /></button>
-                                        <button onClick={() => updateSettings({ ...settings, themeMode: 'dark' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'dark' ? 'bg-black shadow text-white' : 'opacity-50'}`}><Moon size={16} /></button>
+                                        <button aria-label={translate(settings.language, 'lightMode')} onClick={() => updateSettings({ ...settings, themeMode: 'light' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'light' ? 'bg-white shadow text-black' : 'opacity-50'}`}><Sun size={16} /></button>
+                                        <button aria-label={translate(settings.language, 'darkMode')} onClick={() => updateSettings({ ...settings, themeMode: 'dark' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'dark' ? 'bg-black shadow text-white' : 'opacity-50'}`}><Moon size={16} /></button>
                                     </div>
                                 </div>
 
