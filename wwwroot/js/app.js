@@ -20,7 +20,8 @@ const translate = (lang, key) => {
             empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
             quickStartText: "Ekrana çift tıkla favorile. Basılı tut duraklat. İki parmakla yazı boyutu ayarla. Biyonik okuma ve seslendirme aktiftir. Sağ üstteki ses butonu ile okumayı açabilirsiniz.",
             restored: "Yüklendi!", error: "Hata", importFile: "Dosya Al", importing: "Aktarılıyor...",
-            fileError: "Dosya hatası", sentences: "Cümle"
+            fileError: "Dosya hatası", sentences: "Cümle",
+            fullscreen: "Tam Ekran", exitFullscreen: "Tam Ekrandan Çık", mute: "Sessize Al", unmute: "Sesi Aç"
         },
         en: {
             app: "Smart Reading", my: "My Notes", fav: "Favorites", rev: "Review", no: "No notes.",
@@ -32,7 +33,8 @@ const translate = (lang, key) => {
             quickStartTitle: "Quick Start",
             quickStartText: "Double tap to favorite. Long press to pause. Pinch for font size. Bionic reading and TTS enabled. Toggle sound with the top right button.",
             restored: "Restored!", error: "Error", importFile: "Import File", importing: "Importing...",
-            fileError: "File error", sentences: "Sentences"
+            fileError: "File error", sentences: "Sentences",
+            fullscreen: "Fullscreen", exitFullscreen: "Exit Fullscreen", mute: "Mute", unmute: "Unmute"
         }
     };
     return dictionary[lang][key] || "";
@@ -543,7 +545,11 @@ const Reader = ({ note, settings, onExit, onFavorite, isBreakMode, onProgress })
                     <button onClick={e => { e.stopPropagation(); handleDoubleTap(queue[currentIndexRef.current]?.id); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
                         <Heart size={24} className={activeNoteRef.current.sentences.find(s => s.id === queue[currentIndexRef.current]?.id)?.isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }}
+                        className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20"
+                        aria-label={translate(settings.language, isMuted ? 'unmute' : 'mute')}
+                    >
                         {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
                     </button>
                 </div>
@@ -842,10 +848,20 @@ const App = () => {
                                 {pomodoroState === 'break' ? <EyeOff size={20} /> : <Eye size={20} />}
                                 {formatTime(timer)}
                             </button>
-                            <button onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
+                            <button
+                                onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }}
+                                className="p-2 opacity-70 hover:opacity-100"
+                                aria-label={translate(settings.language, isFullscreen ? 'exitFullscreen' : 'fullscreen')}
+                            >
                                 {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
                             </button>
-                            <button onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
+                            <button
+                                onClick={() => setIsSettingsOpen(true)}
+                                className="p-2 opacity-70 hover:opacity-100"
+                                aria-label={translate(settings.language, 'settings')}
+                            >
+                                <Settings size={20} />
+                            </button>
                         </div>
                     </header>
 
@@ -853,14 +869,14 @@ const App = () => {
                     <div className="flex-none p-5 pb-0 bg-[var(--bg)] z-40">
                         <h2 className="text-2xl font-bold mb-4 px-1">{translate(settings.language, 'my')}</h2>
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div onClick={() => startSession('fav')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            <button type="button" onClick={() => startSession('fav')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><Heart size={24} className="text-red-500 fill-red-500" /><span className="text-2xl font-bold opacity-80">{getFavCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'fav')}</div>
-                            </div>
-                            <div onClick={() => startSession('rev')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            </button>
+                            <button type="button" onClick={() => startSession('rev')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><RefreshCcw size={24} className="text-[var(--accent)]" /><span className="text-2xl font-bold opacity-80">{getReviewCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'rev')}</div>
-                            </div>
+                            </button>
                         </div>
                         <div className="h-[1px] w-full bg-gray-500/10 mb-2"></div>
                     </div>
