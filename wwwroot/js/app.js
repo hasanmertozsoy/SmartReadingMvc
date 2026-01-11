@@ -17,7 +17,7 @@ const translate = (lang, key) => {
             language: "Dil", pomodoro: "Pomodoro", focus: "Odak", break: "Mola", backup: "Yedekle",
             restore: "Geri Yükle", done: "Tamam", deleteConfirm: "Silinsin mi?", paused: "Duraklatıldı",
             resume: "Devam Et", saveExit: "Kaydet & Çık", shuffling: "Notlar karıştırılıyor...",
-            empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
+            empty: "Boş not.", delete: "Sil", fullscreen: "Tam Ekran", close: "Kapat", quickStartTitle: "Hızlı Başlangıç",
             quickStartText: "Ekrana çift tıkla favorile. Basılı tut duraklat. İki parmakla yazı boyutu ayarla. Biyonik okuma ve seslendirme aktiftir. Sağ üstteki ses butonu ile okumayı açabilirsiniz.",
             restored: "Yüklendi!", error: "Hata", importFile: "Dosya Al", importing: "Aktarılıyor...",
             fileError: "Dosya hatası", sentences: "Cümle"
@@ -29,7 +29,7 @@ const translate = (lang, key) => {
             language: "Language", pomodoro: "Pomodoro", focus: "Focus", break: "Break", backup: "Backup",
             restore: "Restore", done: "Done", deleteConfirm: "Delete?", paused: "Paused",
             resume: "Resume", saveExit: "Save & Exit", shuffling: "Shuffling...", empty: "Empty.",
-            quickStartTitle: "Quick Start",
+            delete: "Delete", fullscreen: "Fullscreen", close: "Close", quickStartTitle: "Quick Start",
             quickStartText: "Double tap to favorite. Long press to pause. Pinch for font size. Bionic reading and TTS enabled. Toggle sound with the top right button.",
             restored: "Restored!", error: "Error", importFile: "Import File", importing: "Importing...",
             fileError: "File error", sentences: "Sentences"
@@ -837,15 +837,16 @@ const App = () => {
                         <div className="flex items-center gap-3">
                             <button 
                                 onClick={() => setPomodoroState(pomodoroState === 'idle' ? 'work' : 'idle')} 
+                                aria-label={translate(settings.language, pomodoroState === 'idle' ? 'focus' : 'break')}
                                 className={`flex items-center gap-2 px-5 py-2 rounded-full text-lg font-bold font-mono border-2 transition-all active:scale-95 text-[var(--accent)] border-[var(--accent)] bg-[var(--accent)]/10`}
                             >
                                 {pomodoroState === 'break' ? <EyeOff size={20} /> : <Eye size={20} />}
                                 {formatTime(timer)}
                             </button>
-                            <button onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
+                            <button onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} aria-label={translate(settings.language, 'fullscreen')} className="p-2 opacity-70 hover:opacity-100">
                                 {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
                             </button>
-                            <button onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
+                            <button onClick={() => setIsSettingsOpen(true)} aria-label={translate(settings.language, 'settings')} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
                         </div>
                     </header>
 
@@ -853,14 +854,14 @@ const App = () => {
                     <div className="flex-none p-5 pb-0 bg-[var(--bg)] z-40">
                         <h2 className="text-2xl font-bold mb-4 px-1">{translate(settings.language, 'my')}</h2>
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div onClick={() => startSession('fav')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            <button onClick={() => startSession('fav')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><Heart size={24} className="text-red-500 fill-red-500" /><span className="text-2xl font-bold opacity-80">{getFavCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'fav')}</div>
-                            </div>
-                            <div onClick={() => startSession('rev')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            </button>
+                            <button onClick={() => startSession('rev')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><RefreshCcw size={24} className="text-[var(--accent)]" /><span className="text-2xl font-bold opacity-80">{getReviewCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'rev')}</div>
-                            </div>
+                            </button>
                         </div>
                         <div className="h-[1px] w-full bg-gray-500/10 mb-2"></div>
                     </div>
@@ -897,11 +898,12 @@ const App = () => {
                                             <div className="flex gap-2">
                                                 <button 
                                                     onClick={e => { e.stopPropagation(); setIsEditMode(true); setEditId(note.id); setTitleInput(note.title); setContentInput(note.sentences.map(s => s.text).join(' ')); setIsAddModalOpen(true); }} 
+                                                    aria-label={translate(settings.language, 'edit')}
                                                     className="p-2 text-gray-400 hover:text-[var(--accent)] rounded-full z-10 bg-black/5"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
+                                                <button onClick={e => deleteNote(e, note.id)} aria-label={translate(settings.language, 'delete')} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
                                             </div>
                                         </div>
                                     </div>
@@ -913,6 +915,7 @@ const App = () => {
                     {/* Ekle Butonu */}
                     <button 
                         onClick={() => { setIsEditMode(false); setTitleInput(''); setContentInput(''); setIsAddModalOpen(true); }} 
+                        aria-label={translate(settings.language, 'new')}
                         className="fixed bottom-8 right-8 mb-[env(safe-area-inset-bottom)] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 text-white" 
                         style={{ backgroundColor: 'var(--accent)' }}
                     >
