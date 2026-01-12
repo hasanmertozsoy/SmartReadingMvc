@@ -98,33 +98,30 @@ const parseText = (text) => {
  * @returns {string} Base64 formatında resim verisi
  */
 const generatePattern = (hue) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 800;
-    canvas.height = 1600;
-    if (!ctx) return '';
-
-    ctx.fillStyle = `hsl(${hue}, 30%, 10%)`;
-    ctx.fillRect(0, 0, 800, 1600);
+    const width = 800;
+    const height = 1600;
+    let svgContent = `<rect width="${width}" height="${height}" fill="hsl(${hue}, 30%, 10%)"/>`;
 
     for (let i = 0; i < 20; i++) {
-        ctx.fillStyle = `hsla(${(hue + Math.random() * 60 - 30) % 360}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
+        const fill = `hsla(${(hue + Math.random() * 60 - 30) % 360}, 60%, 50%, ${Math.random() * 0.15 + 0.05})`;
         const type = Math.random();
         const x = Math.random() * 800;
         const y = Math.random() * 1600;
         const size = Math.random() * 150 + 30;
 
-        ctx.beginPath();
-        if (type < 0.4) ctx.arc(x, y, size, 0, Math.PI * 2);
-        else if (type < 0.8) ctx.rect(x - size / 2, y - size / 2, size, size);
-        else {
-            ctx.moveTo(x, y - size);
-            ctx.lineTo(x + size, y + size);
-            ctx.lineTo(x - size, y + size);
+        if (type < 0.4) {
+            svgContent += `<circle cx="${x}" cy="${y}" r="${size}" fill="${fill}" />`;
+        } else if (type < 0.8) {
+            svgContent += `<rect x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}" fill="${fill}" />`;
+        } else {
+            const p1 = `${x},${y - size}`;
+            const p2 = `${x + size},${y + size}`;
+            const p3 = `${x - size},${y + size}`;
+            svgContent += `<polygon points="${p1} ${p2} ${p3}" fill="${fill}" />`;
         }
-        ctx.fill();
     }
-    return canvas.toDataURL('image/jpeg', 0.6);
+
+    return `data:image/svg+xml;base64,${btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${svgContent}</svg>`)}`;
 };
 
 /**
