@@ -853,14 +853,14 @@ const App = () => {
                     <div className="flex-none p-5 pb-0 bg-[var(--bg)] z-40">
                         <h2 className="text-2xl font-bold mb-4 px-1">{translate(settings.language, 'my')}</h2>
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div onClick={() => startSession('fav')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            <button type="button" onClick={() => startSession('fav')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><Heart size={24} className="text-red-500 fill-red-500" /><span className="text-2xl font-bold opacity-80">{getFavCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'fav')}</div>
-                            </div>
-                            <div onClick={() => startSession('rev')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            </button>
+                            <button type="button" onClick={() => startSession('rev')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><RefreshCcw size={24} className="text-[var(--accent)]" /><span className="text-2xl font-bold opacity-80">{getReviewCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'rev')}</div>
-                            </div>
+                            </button>
                         </div>
                         <div className="h-[1px] w-full bg-gray-500/10 mb-2"></div>
                     </div>
