@@ -20,7 +20,8 @@ const translate = (lang, key) => {
             empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
             quickStartText: "Ekrana çift tıkla favorile. Basılı tut duraklat. İki parmakla yazı boyutu ayarla. Biyonik okuma ve seslendirme aktiftir. Sağ üstteki ses butonu ile okumayı açabilirsiniz.",
             restored: "Yüklendi!", error: "Hata", importFile: "Dosya Al", importing: "Aktarılıyor...",
-            fileError: "Dosya hatası", sentences: "Cümle"
+            fileError: "Dosya hatası", sentences: "Cümle", close: "Kapat", mute: "Sessize Al", unmute: "Sesi Aç",
+            fullscreen: "Tam Ekran", exitFullscreen: "Tam Ekrandan Çık", delete: "Sil", favorite: "Favorilere Ekle", unfavorite: "Favorilerden Çıkar"
         },
         en: {
             app: "Smart Reading", my: "My Notes", fav: "Favorites", rev: "Review", no: "No notes.",
@@ -32,7 +33,8 @@ const translate = (lang, key) => {
             quickStartTitle: "Quick Start",
             quickStartText: "Double tap to favorite. Long press to pause. Pinch for font size. Bionic reading and TTS enabled. Toggle sound with the top right button.",
             restored: "Restored!", error: "Error", importFile: "Import File", importing: "Importing...",
-            fileError: "File error", sentences: "Sentences"
+            fileError: "File error", sentences: "Sentences", close: "Close", mute: "Mute", unmute: "Unmute",
+            fullscreen: "Fullscreen", exitFullscreen: "Exit Fullscreen", delete: "Delete", favorite: "Add to Favorites", unfavorite: "Remove from Favorites"
         }
     };
     return dictionary[lang][key] || "";
@@ -539,11 +541,11 @@ const Reader = ({ note, settings, onExit, onFavorite, isBreakMode, onProgress })
             {/* Üst Sağ Kontroller */}
             <div className={`absolute top-0 right-0 p-4 pt-[calc(env(safe-area-inset-top)+3.5rem)] transition-opacity duration-300 ${showControls && !isPaused && !isBreakMode ? 'opacity-100' : 'opacity-0'} pointer-events-none`}>
                 <div className="flex flex-col items-end gap-2">
-                    <button onClick={() => { handleSentenceFinish(currentIndexRef.current); onExit(); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20"><X size={24} /></button>
-                    <button onClick={e => { e.stopPropagation(); handleDoubleTap(queue[currentIndexRef.current]?.id); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
+                    <button aria-label={translate(settings.language, 'close')} onClick={() => { handleSentenceFinish(currentIndexRef.current); onExit(); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20"><X size={24} /></button>
+                    <button aria-label={translate(settings.language, activeNoteRef.current.sentences.find(s => s.id === queue[currentIndexRef.current]?.id)?.isFavorite ? 'unfavorite' : 'favorite')} onClick={e => { e.stopPropagation(); handleDoubleTap(queue[currentIndexRef.current]?.id); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
                         <Heart size={24} className={activeNoteRef.current.sentences.find(s => s.id === queue[currentIndexRef.current]?.id)?.isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
+                    <button aria-label={translate(settings.language, isMuted ? 'unmute' : 'mute')} onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
                         {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
                     </button>
                 </div>
@@ -842,10 +844,10 @@ const App = () => {
                                 {pomodoroState === 'break' ? <EyeOff size={20} /> : <Eye size={20} />}
                                 {formatTime(timer)}
                             </button>
-                            <button onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
+                            <button aria-label={translate(settings.language, isFullscreen ? 'exitFullscreen' : 'fullscreen')} onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
                                 {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
                             </button>
-                            <button onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
+                            <button aria-label={translate(settings.language, 'settings')} onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
                         </div>
                     </header>
 
@@ -853,14 +855,14 @@ const App = () => {
                     <div className="flex-none p-5 pb-0 bg-[var(--bg)] z-40">
                         <h2 className="text-2xl font-bold mb-4 px-1">{translate(settings.language, 'my')}</h2>
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div onClick={() => startSession('fav')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            <button type="button" onClick={() => startSession('fav')} className="relative w-full text-left p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><Heart size={24} className="text-red-500 fill-red-500" /><span className="text-2xl font-bold opacity-80">{getFavCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'fav')}</div>
-                            </div>
-                            <div onClick={() => startSession('rev')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            </button>
+                            <button type="button" onClick={() => startSession('rev')} className="relative w-full text-left p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><RefreshCcw size={24} className="text-[var(--accent)]" /><span className="text-2xl font-bold opacity-80">{getReviewCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'rev')}</div>
-                            </div>
+                            </button>
                         </div>
                         <div className="h-[1px] w-full bg-gray-500/10 mb-2"></div>
                     </div>
@@ -876,13 +878,16 @@ const App = () => {
                             <div className="space-y-4">
                                 {notes.map((note, i) => (
                                     <div 
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveNote(note); setCurrentView('reader'); } }}
                                         key={note.id} 
                                         draggable 
                                         onDragStart={e => handleDragStart(e, i)} 
                                         onDragEnter={() => handleDragEnter(i)} 
                                         onDragEnd={handleDragEnd} 
                                         onClick={() => { setActiveNote(note); setCurrentView('reader'); }} 
-                                        className={`relative p-5 rounded-2xl shadow-sm border border-gray-500/5 transition-all cursor-pointer select-none overflow-hidden ${draggedIndex === i ? 'opacity-50 scale-95 ring-2 ring-[var(--accent)]' : 'opacity-100 hover:scale-[1.01]'}`} 
+                                        className={`relative w-full text-left p-5 rounded-2xl shadow-sm border border-gray-500/5 transition-all cursor-pointer select-none overflow-hidden ${draggedIndex === i ? 'opacity-50 scale-95 ring-2 ring-[var(--accent)]' : 'opacity-100 hover:scale-[1.01]'}`}
                                         style={{ backgroundColor: 'var(--card-bg)' }}
                                     >
                                         <div className="absolute bottom-0 left-0 h-1 bg-[var(--accent)] transition-all duration-500" style={{ width: `${note.progress}%` }} />
@@ -896,12 +901,13 @@ const App = () => {
                                             </div>
                                             <div className="flex gap-2">
                                                 <button 
+                                                    aria-label={translate(settings.language, 'edit')}
                                                     onClick={e => { e.stopPropagation(); setIsEditMode(true); setEditId(note.id); setTitleInput(note.title); setContentInput(note.sentences.map(s => s.text).join(' ')); setIsAddModalOpen(true); }} 
                                                     className="p-2 text-gray-400 hover:text-[var(--accent)] rounded-full z-10 bg-black/5"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
+                                                <button aria-label={translate(settings.language, 'delete')} onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
                                             </div>
                                         </div>
                                     </div>
