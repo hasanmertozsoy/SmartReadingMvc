@@ -1,0 +1,3 @@
+## 2026-01-21 - [Localization Dictionary Gap for UI Controls]
+**Learning:** The application's localization dictionary (`tr`/`en` keys in `app.js`) contained translations for general terms but was missing specific keys for accessibility labels on icon-only UI controls (e.g., `close`, `mute`, `fullscreen`). Developers were using hardcoded icon classes or visible text for layout but neglecting `aria-label`s for screen readers.
+**Action:** When auditing accessibility, cross-reference the localization dictionary with all icon-only buttons in the UI. Ensure every interactive element has a corresponding key in the dictionary and applies it via `aria-label`.
