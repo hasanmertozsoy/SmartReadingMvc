@@ -1,4 +1,4 @@
-**Smart Reading**, kullanıcıların okuma hızını artırmayı, odaklanma süresini iyileştirmeyi ve metinleri daha verimli bir şekilde analiz etmelerini sağlayan yapay zeka destekli bir okuma asistanıdır.
+**Smart Reading**, kullanıcıların okuma hızını artırmayı, odaklanma süresini iyileştirmeyi ve metinleri daha verimli bir şekilde analiz etmelerini sağlayan yapay zeka dinamik ağırlıklandırmasından ilham alan bir okuma asistanıdır.
 
 İstemci tarafında **React (ES Modules)** ve **Tailwind CSS** kullanılarak, derleme gerektirmeyen (no-build) hibrit bir yapı oluşturulmuştur.
 
