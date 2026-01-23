@@ -15,6 +15,7 @@ const translate = (lang, key) => {
             edit: "Düzenle", new: "Yeni Not", title: "Başlık", content: "İçerik...", cancel: "İptal",
             save: "Kaydet", update: "Güncelle", settings: "Ayarlar", theme: "Tema", appearance: "Görünüm",
             language: "Dil", pomodoro: "Pomodoro", focus: "Odak", break: "Mola", backup: "Yedekle",
+            lightMode: "Aydınlık Mod", darkMode: "Karanlık Mod",
             restore: "Geri Yükle", done: "Tamam", deleteConfirm: "Silinsin mi?", paused: "Duraklatıldı",
             resume: "Devam Et", saveExit: "Kaydet & Çık", shuffling: "Notlar karıştırılıyor...",
             empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
@@ -27,6 +28,7 @@ const translate = (lang, key) => {
             edit: "Edit", new: "New Note", title: "Title", content: "Content...", cancel: "Cancel",
             save: "Save", update: "Update", settings: "Settings", theme: "Theme", appearance: "Appearance",
             language: "Language", pomodoro: "Pomodoro", focus: "Focus", break: "Break", backup: "Backup",
+            lightMode: "Light Mode", darkMode: "Dark Mode",
             restore: "Restore", done: "Done", deleteConfirm: "Delete?", paused: "Paused",
             resume: "Resume", saveExit: "Save & Exit", shuffling: "Shuffling...", empty: "Empty.",
             quickStartTitle: "Quick Start",
@@ -853,14 +855,14 @@ const App = () => {
                     <div className="flex-none p-5 pb-0 bg-[var(--bg)] z-40">
                         <h2 className="text-2xl font-bold mb-4 px-1">{translate(settings.language, 'my')}</h2>
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div onClick={() => startSession('fav')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            <button type="button" onClick={() => startSession('fav')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><Heart size={24} className="text-red-500 fill-red-500" /><span className="text-2xl font-bold opacity-80">{getFavCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'fav')}</div>
-                            </div>
-                            <div onClick={() => startSession('rev')} className="relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10" style={{ backgroundColor: 'var(--card-bg)' }}>
+                            </button>
+                            <button type="button" onClick={() => startSession('rev')} className="w-full text-left relative p-4 rounded-2xl cursor-pointer group hover:scale-[1.02] transition-transform shadow-sm border border-gray-500/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style={{ backgroundColor: 'var(--card-bg)' }}>
                                 <div className="flex justify-between items-start mb-2"><RefreshCcw size={24} className="text-[var(--accent)]" /><span className="text-2xl font-bold opacity-80">{getReviewCount()}</span></div>
                                 <div className="font-medium opacity-70">{translate(settings.language, 'rev')}</div>
-                            </div>
+                            </button>
                         </div>
                         <div className="h-[1px] w-full bg-gray-500/10 mb-2"></div>
                     </div>
@@ -964,6 +966,7 @@ const App = () => {
                                         {Object.keys(THEME_HUES).map(color => (
                                             <button 
                                                 key={color} 
+                                                aria-label={color}
                                                 onClick={() => updateSettings({ ...settings, themeColor: color })} 
                                                 className={`w-8 h-8 rounded-full border-2 ${settings.themeColor === color ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-50'}`} 
                                                 style={{ backgroundColor: `hsl(${THEME_HUES[color]}, 80%, 50%)` }} 
@@ -975,8 +978,8 @@ const App = () => {
                                 <div className="mb-6">
                                     <label className="text-xs font-bold uppercase opacity-50 mb-2 block">{translate(settings.language, 'appearance')}</label>
                                     <div className="flex bg-black/10 rounded-lg p-1">
-                                        <button onClick={() => updateSettings({ ...settings, themeMode: 'light' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'light' ? 'bg-white shadow text-black' : 'opacity-50'}`}><Sun size={16} /></button>
-                                        <button onClick={() => updateSettings({ ...settings, themeMode: 'dark' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'dark' ? 'bg-black shadow text-white' : 'opacity-50'}`}><Moon size={16} /></button>
+                                        <button aria-label={translate(settings.language, 'lightMode')} onClick={() => updateSettings({ ...settings, themeMode: 'light' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'light' ? 'bg-white shadow text-black' : 'opacity-50'}`}><Sun size={16} /></button>
+                                        <button aria-label={translate(settings.language, 'darkMode')} onClick={() => updateSettings({ ...settings, themeMode: 'dark' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'dark' ? 'bg-black shadow text-white' : 'opacity-50'}`}><Moon size={16} /></button>
                                     </div>
                                 </div>
 
