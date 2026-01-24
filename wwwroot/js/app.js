@@ -20,7 +20,9 @@ const translate = (lang, key) => {
             empty: "Boş not.", quickStartTitle: "Hızlı Başlangıç",
             quickStartText: "Ekrana çift tıkla favorile. Basılı tut duraklat. İki parmakla yazı boyutu ayarla. Biyonik okuma ve seslendirme aktiftir. Sağ üstteki ses butonu ile okumayı açabilirsiniz.",
             restored: "Yüklendi!", error: "Hata", importFile: "Dosya Al", importing: "Aktarılıyor...",
-            fileError: "Dosya hatası", sentences: "Cümle"
+            fileError: "Dosya hatası", sentences: "Cümle", delete: "Sil", close: "Kapat", toggleFav: "Favorile",
+            mute: "Sessize Al", unmute: "Sesi Aç", maximize: "Tam Ekran", minimize: "Küçült",
+            lightMode: "Aydınlık Mod", darkMode: "Karanlık Mod", addNote: "Not Ekle"
         },
         en: {
             app: "Smart Reading", my: "My Notes", fav: "Favorites", rev: "Review", no: "No notes.",
@@ -32,7 +34,9 @@ const translate = (lang, key) => {
             quickStartTitle: "Quick Start",
             quickStartText: "Double tap to favorite. Long press to pause. Pinch for font size. Bionic reading and TTS enabled. Toggle sound with the top right button.",
             restored: "Restored!", error: "Error", importFile: "Import File", importing: "Importing...",
-            fileError: "File error", sentences: "Sentences"
+            fileError: "File error", sentences: "Sentences", delete: "Delete", close: "Close", toggleFav: "Favorite",
+            mute: "Mute", unmute: "Unmute", maximize: "Maximize", minimize: "Minimize",
+            lightMode: "Light Mode", darkMode: "Dark Mode", addNote: "Add Note"
         }
     };
     return dictionary[lang][key] || "";
@@ -539,11 +543,11 @@ const Reader = ({ note, settings, onExit, onFavorite, isBreakMode, onProgress })
             {/* Üst Sağ Kontroller */}
             <div className={`absolute top-0 right-0 p-4 pt-[calc(env(safe-area-inset-top)+3.5rem)] transition-opacity duration-300 ${showControls && !isPaused && !isBreakMode ? 'opacity-100' : 'opacity-0'} pointer-events-none`}>
                 <div className="flex flex-col items-end gap-2">
-                    <button onClick={() => { handleSentenceFinish(currentIndexRef.current); onExit(); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20"><X size={24} /></button>
-                    <button onClick={e => { e.stopPropagation(); handleDoubleTap(queue[currentIndexRef.current]?.id); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
+                    <button aria-label={translate(settings.language, 'close')} onClick={() => { handleSentenceFinish(currentIndexRef.current); onExit(); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20"><X size={24} /></button>
+                    <button aria-label={translate(settings.language, 'toggleFav')} onClick={e => { e.stopPropagation(); handleDoubleTap(queue[currentIndexRef.current]?.id); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
                         <Heart size={24} className={activeNoteRef.current.sentences.find(s => s.id === queue[currentIndexRef.current]?.id)?.isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
+                    <button aria-label={translate(settings.language, isMuted ? 'unmute' : 'mute')} onClick={(e) => { e.stopPropagation(); setIsMuted(!isMuted); }} className="p-3 bg-black/50 rounded-full text-white pointer-events-auto hover:bg-white/20">
                         {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
                     </button>
                 </div>
@@ -842,10 +846,10 @@ const App = () => {
                                 {pomodoroState === 'break' ? <EyeOff size={20} /> : <Eye size={20} />}
                                 {formatTime(timer)}
                             </button>
-                            <button onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
+                            <button aria-label={translate(settings.language, isFullscreen ? 'minimize' : 'maximize')} onClick={() => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }} className="p-2 opacity-70 hover:opacity-100">
                                 {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
                             </button>
-                            <button onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
+                            <button aria-label={translate(settings.language, 'settings')} onClick={() => setIsSettingsOpen(true)} className="p-2 opacity-70 hover:opacity-100"><Settings size={20} /></button>
                         </div>
                     </header>
 
@@ -896,12 +900,13 @@ const App = () => {
                                             </div>
                                             <div className="flex gap-2">
                                                 <button 
+                                                    aria-label={translate(settings.language, 'edit')}
                                                     onClick={e => { e.stopPropagation(); setIsEditMode(true); setEditId(note.id); setTitleInput(note.title); setContentInput(note.sentences.map(s => s.text).join(' ')); setIsAddModalOpen(true); }} 
                                                     className="p-2 text-gray-400 hover:text-[var(--accent)] rounded-full z-10 bg-black/5"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
+                                                <button aria-label={translate(settings.language, 'delete')} onClick={e => deleteNote(e, note.id)} className="p-2 text-gray-400 hover:text-red-400 rounded-full z-10 bg-black/5"><Trash2 size={16} /></button>
                                             </div>
                                         </div>
                                     </div>
@@ -912,6 +917,7 @@ const App = () => {
 
                     {/* Ekle Butonu */}
                     <button 
+                        aria-label={translate(settings.language, 'addNote')}
                         onClick={() => { setIsEditMode(false); setTitleInput(''); setContentInput(''); setIsAddModalOpen(true); }} 
                         className="fixed bottom-8 right-8 mb-[env(safe-area-inset-bottom)] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 text-white" 
                         style={{ backgroundColor: 'var(--accent)' }}
@@ -963,6 +969,7 @@ const App = () => {
                                     <div className="grid grid-cols-6 gap-2">
                                         {Object.keys(THEME_HUES).map(color => (
                                             <button 
+                                                aria-label={color}
                                                 key={color} 
                                                 onClick={() => updateSettings({ ...settings, themeColor: color })} 
                                                 className={`w-8 h-8 rounded-full border-2 ${settings.themeColor === color ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-50'}`} 
@@ -975,8 +982,8 @@ const App = () => {
                                 <div className="mb-6">
                                     <label className="text-xs font-bold uppercase opacity-50 mb-2 block">{translate(settings.language, 'appearance')}</label>
                                     <div className="flex bg-black/10 rounded-lg p-1">
-                                        <button onClick={() => updateSettings({ ...settings, themeMode: 'light' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'light' ? 'bg-white shadow text-black' : 'opacity-50'}`}><Sun size={16} /></button>
-                                        <button onClick={() => updateSettings({ ...settings, themeMode: 'dark' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'dark' ? 'bg-black shadow text-white' : 'opacity-50'}`}><Moon size={16} /></button>
+                                        <button aria-label={translate(settings.language, 'lightMode')} onClick={() => updateSettings({ ...settings, themeMode: 'light' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'light' ? 'bg-white shadow text-black' : 'opacity-50'}`}><Sun size={16} /></button>
+                                        <button aria-label={translate(settings.language, 'darkMode')} onClick={() => updateSettings({ ...settings, themeMode: 'dark' })} className={`flex-1 py-2 rounded-md flex justify-center ${settings.themeMode === 'dark' ? 'bg-black shadow text-white' : 'opacity-50'}`}><Moon size={16} /></button>
                                     </div>
                                 </div>
 
